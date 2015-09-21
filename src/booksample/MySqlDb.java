@@ -47,7 +47,46 @@ public class MySqlDb {
     }
     
     public void deleteById(String tableName, String PKName, Object target) throws SQLException{
-        //delete from (table) where id = id
+        //delete from [table] where [column] = [value]
+        
+        String sql = "DELETE FROM " + tableName + " WHERE " + PKName + "=";
+        if(target instanceof String){
+            sql += "\"" + (String)target + "\"";
+        } else {
+            sql += (String)target;
+        }
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
+    }
+    
+    public void prepDeleteById(String tableName, String PKName, Object target) throws SQLException{
+        //delete from [table] where [column] = [value]
+        String sql = "DELETE FROM ? WHERE ? = ?";
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try{
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, tableName);
+            pstmt.setString(2, PKName);
+            if(target instanceof String){
+                pstmt.setString(3, (String)target);
+            } else {
+                pstmt.setInt(3, (Integer)target);
+            }
+            rs = pstmt.executeQuery();
+        } catch (SQLException sqle) {
+            System.out.println(sqle);
+        } catch (Exception e) {
+            System.out.println(e);
+        } finally {
+            try {
+                pstmt.close();
+                conn.close();
+            } catch(Exception e) {
+                System.out.println(e);
+            }
+        }
     }
     
     public void deleteByField(String tableName, String fieldName, Object target) throws SQLException{
