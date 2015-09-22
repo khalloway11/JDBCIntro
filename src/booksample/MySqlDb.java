@@ -14,13 +14,14 @@ import java.util.*;
  */
 public class MySqlDb {
     //class variables
-    private static final String SELECT_ALL = "SELECT * FROM ? ";
-    private static final String SELECT_QUERY = "SELECT ? FROM ? ";
+    private static final String SELECT_ALL = "SELECT * FROM ";
+    private static final String SELECT_QUERY = "SELECT ? FROM ";
     private static final String SELECT_TARGET = "WHERE ? = ? ";
-    private static final String DELETE_QUERY = "DELETE ? FROM ? ";
+    private static final String DELETE_QUERY = "DELETE ? FROM ";
     private static final String DELETE_TARGET = "WHERE ? = ? ";
-    private static final String INSERT_QUERY = "INSERT INTO ? ? VALUES ?";
+    private static final String INSERT_QUERY = "INSERT INTO ";
     private Connection conn;
+    private final PrepStatementBuilderStrategy pstmtBuilder = new SQLPrepStatementBuilder();
     
     public void openConnection(String driverClass, String url, String userName, String password) throws Exception {
         Class.forName (driverClass);
@@ -51,7 +52,7 @@ public class MySqlDb {
         return records;
     }
     
-    public void deleteById(String tableName, String PKName, Object target) throws SQLException{
+    public int deleteById(String tableName, String PKName, Object target) throws SQLException{
         //delete from [table] where [column] = [value]
         
         String sql = "DELETE FROM " + tableName + " WHERE " + PKName + "=";
@@ -61,26 +62,17 @@ public class MySqlDb {
             sql += (String)target;
         }
         Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery(sql);
+        return stmt.executeUpdate(sql);
     }
     
-    public void prepDelete(String tableName, String ColName, Object target) throws SQLException{
+    public int prepDelete(String tableName, List colNames, String operator, Object target) throws SQLException{
         //syntax:
-        //delete from [table] where [column] = [value]
-        String sql = DELETE_QUERY + DELETE_TARGET;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
+        //delete from [table] where [column] (<,<=,=,>=,>,!=,BETWEEN,LIKE,IN) [value]
+        int deleted = 0;
+        PreparedStatement pstmt = pstmtBuilder.buildDeleteStatement(conn, tableName, colNames, operator, target);
         
         try{
-            pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, tableName);
-            pstmt.setString(2, ColName);
-            if(target instanceof String){
-                pstmt.setString(3, (String)target);
-            } else {
-                pstmt.setInt(3, (Integer)target);
-            }
-            rs = pstmt.executeQuery();
+            deleted = pstmt.executeUpdate();
         } catch (SQLException sqle) {
             System.out.println(sqle);
         } catch (Exception e) {
@@ -93,6 +85,7 @@ public class MySqlDb {
                 System.out.println(e);
             }
         }
+        return deleted;
     }
     
     public void update(String tableName, Object fieldName, Object newValue) throws SQLException{
@@ -109,6 +102,10 @@ public class MySqlDb {
         MySqlDb db = new MySqlDb();
         db.openConnection("com.mysql.jdbc.Driver", "jdbc:mysql://localhost:3306/book", "root", "admin");
         List<Map<String, Object>> records = db.findAllRecords("author");
+        for(Map record : records){
+            System.out.println(record);
+        }
+        records = db.findAllRecords("author");
         for(Map record : records){
             System.out.println(record);
         }
