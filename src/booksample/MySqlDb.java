@@ -14,7 +14,12 @@ import java.util.*;
  */
 public class MySqlDb {
     //class variables
-    private static final String SELECT_ALL = "SELECT * FROM ";
+    private static final String SELECT_ALL = "SELECT * FROM ? ";
+    private static final String SELECT_QUERY = "SELECT ? FROM ? ";
+    private static final String SELECT_TARGET = "WHERE ? = ? ";
+    private static final String DELETE_QUERY = "DELETE ? FROM ? ";
+    private static final String DELETE_TARGET = "WHERE ? = ? ";
+    private static final String INSERT_QUERY = "INSERT INTO ? ? VALUES ?";
     private Connection conn;
     
     public void openConnection(String driverClass, String url, String userName, String password) throws Exception {
@@ -59,16 +64,17 @@ public class MySqlDb {
         ResultSet rs = stmt.executeQuery(sql);
     }
     
-    public void prepDeleteById(String tableName, String PKName, Object target) throws SQLException{
+    public void prepDelete(String tableName, String ColName, Object target) throws SQLException{
+        //syntax:
         //delete from [table] where [column] = [value]
-        String sql = "DELETE FROM ? WHERE ? = ?";
+        String sql = DELETE_QUERY + DELETE_TARGET;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         
         try{
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, tableName);
-            pstmt.setString(2, PKName);
+            pstmt.setString(2, ColName);
             if(target instanceof String){
                 pstmt.setString(3, (String)target);
             } else {
@@ -89,16 +95,10 @@ public class MySqlDb {
         }
     }
     
-    public void deleteByField(String tableName, String fieldName, Object target) throws SQLException{
-        
-    }
-    
-    public void updateById(String tableName, String PKName, Object newValue) throws SQLException{
-        
-    }
-    
-    public void updateByField(String tableName, Object fieldName, Object newValue) throws SQLException{
-        
+    public void update(String tableName, Object fieldName, Object newValue) throws SQLException{
+        //syntax:
+        //update [table] set [column] = [new value] 
+        //where [column] = [old value]
     }
     
     public void createRecord(String tableName, Object[] newRecordInfo) throws SQLException{
