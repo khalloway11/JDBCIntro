@@ -15,7 +15,7 @@ import java.util.List;
  * @author Keiji
  */
 public interface PrepStatementBuilderStrategy {
-    public PreparedStatement buildDeleteStatement(Connection conn_loc, String tableName, List colDescriptors, String operator, Object target) throws SQLException;
-    public PreparedStatement buildUpdateStatement(Connection conn_loc, String tableName, List colDescriptors, String whereField) throws SQLException;
-    public PreparedStatement buildInsertStatement(Connection conn_loc, String tableName, List colDescriptors, String whereField) throws SQLException;
+    public PreparedStatement buildDeleteStatement(Connection conn_loc, String tableName, String colName, String whereField, Object target) throws SQLException;
+    public PreparedStatement buildUpdateStatement(Connection conn_loc, String tableName, List whereColDescriptors, List operators, List targets) throws SQLException;
+    public PreparedStatement buildInsertStatement(Connection conn_loc, String tableName, List colDescriptors, List colValues) throws SQLException;
 }
