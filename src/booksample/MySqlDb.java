@@ -65,11 +65,11 @@ public class MySqlDb {
         return stmt.executeUpdate(sql);
     }
     
-    public int prepDelete(String tableName, String colName, String whereField, Object target) throws SQLException{
+    public int prepDelete(String tableName, String targetCol, Object targetRecord) throws SQLException{
         //syntax:
         //delete from [table] where [column] (<,<=,=,>=,>,!=,BETWEEN,LIKE,IN) [value]
         int deleted = 0;
-        PreparedStatement pstmt = pstmtBuilder.buildDeleteStatement(conn, tableName, whereField, colName, target);
+        PreparedStatement pstmt = pstmtBuilder.buildDeleteStatement(conn, tableName, targetCol, targetRecord);
         
         try{
             deleted = pstmt.executeUpdate();
@@ -105,6 +105,7 @@ public class MySqlDb {
         for(Map record : records){
             System.out.println(record);
         }
+        db.prepDelete("author", "author_id", 1);
         records = db.findAllRecords("author");
         for(Map record : records){
             System.out.println(record);

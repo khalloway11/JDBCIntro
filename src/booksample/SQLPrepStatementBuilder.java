@@ -18,16 +18,16 @@ import java.util.List;
 public class SQLPrepStatementBuilder implements PrepStatementBuilderStrategy {
 
     @Override
-    public PreparedStatement buildDeleteStatement(Connection conn_loc, String tableName, String colName, String whereField, Object target) throws SQLException{
+    public PreparedStatement buildDeleteStatement(Connection conn_loc, String tableName, String targetCol, Object targetRecord) throws SQLException{
         //syntax:
         //delete from [table] where [column] (<,<=,=,>=,>,!=,BETWEEN,LIKE,IN) [value]
         PreparedStatement pstmt = null;
         final StringBuffer sql = new StringBuffer("DELETE FROM ");
         sql.append(tableName);
-        if((whereField != null) && (colName != null)){
+        if((targetCol != null) && (targetRecord != null)){
             sql.append(" WHERE ");
-            sql.append(colName); sql.append(" ");
-            sql.append((String)target); sql.append(" = ");
+            sql.append(targetCol); sql.append(" ");
+            sql.append((String)targetRecord); sql.append(" = ");
             sql.append("?");
             final String finalSQL = sql.toString();
             System.out.println(finalSQL);
